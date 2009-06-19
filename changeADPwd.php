@@ -20,14 +20,14 @@ if ($successUrl == "") { $successUrl = $defaultsuccessurl; }
 if (validate_new_pwd($newPwdOne, $newPwdTwo)){
   // connect to LDAP server
   if ($debug) {
-      $dtStamp = date("d/m/y : H:i:s", time());
+      $dtStamp = date("m/d/y : H:i:s", time());
       file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Validated Password\n" , FILE_APPEND | LOCK_EX);
   }
   $ldap = ldap_connect("ldaps://$ldapHost",636) or $ldap = false;
   if ($ldap) {
      //Connected successfully to ldap server
       if ($debug) {
-        $dtStamp = date("d/m/y : H:i:s", time());
+        $dtStamp = date("m/d/y: H:i:s", time());
         file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Connected to LDAP Server\n" , FILE_APPEND | LOCK_EX);
       }
     $res = ldap_bind($ldap,$binddn,$bindpwd) or $res = false;
@@ -35,11 +35,11 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
     {
       //Succcessfully bound with search DN login
       if ($debug) {
-        $dtStamp = date("d/m/y : H:i:s", time());
+        $dtStamp = date("m/d/y: H:i:s", time());
         file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Bound with Search DN: $binddn Passwd: $bindpwd\n" , FILE_APPEND | LOCK_EX);
       }
       if ($debug) {
-          $dtStamp = date("d/m/y : H:i:s", time());
+          $dtStamp = date("m/d/y: H:i:s", time());
           file_put_contents($logfile,"DEBUG: $dtStamp: Searching for user: $uid\n" , FILE_APPEND | LOCK_EX);
       }
       $filter = "samaccountname=".$uid;
@@ -48,7 +48,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
       {
         // Found username
         if ($debug) {
-          $dtStamp = date("d/m/y : H:i:s", time());
+          $dtStamp = date("m/d/y: H:i:s", time());
           file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Found User\n" , FILE_APPEND | LOCK_EX);
         }
         $info = ldap_get_entries($ldap,$sr);
@@ -57,19 +57,19 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
           //Aquired user CN
           $user_cn = $info[0]["cn"][0];
           if ($debug) {
-            $dtStamp = date("d/m/y : H:i:s", time());
+            $dtStamp = date("m/d/y: H:i:s", time());
             file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Found User CN: $user_cn\n" , FILE_APPEND | LOCK_EX);
           }
           $ldap = ldap_connect("ldaps://$ldapHost",636) or $ldap = false;
           if ($ldap) {
             if ($debug) {
-              $dtStamp = date("d/m/y : H:i:s", time());
+              $dtStamp = date("m/d/y: H:i:s", time());
               file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Connected to LDAP Server Second Time\n" , FILE_APPEND | LOCK_EX);
             }
             $userdn = "cn=".$user_cn.", ".$oudc;
             //look up OU
             if ($debug) {
-              $dtStamp = date("d/m/y : H:i:s", time());
+              $dtStamp = date("m/d/y: H:i:s", time());
               file_put_contents($logfile,"DEBUG: $dtStamp: UserDN: $userdn\n" , FILE_APPEND | LOCK_EX);
             }
             $res = @ldap_set_option($ldap , LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -77,7 +77,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
             if ($res)
             {
               if ($debug) {
-                $dtStamp = date("d/m/y : H:i:s", time());
+                $dtStamp = date("m/d/y: H:i:s", time());
                 file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Bound With User: $userdn Password: $curPwd\n" , FILE_APPEND | LOCK_EX);
               }
           
@@ -97,7 +97,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
               if ($res) {
                 //Successfully Changed user Password
                 if ($debug) {
-                  $dtStamp = date("d/m/y : H:i:s", time());
+                  $dtStamp = date("m/d/y: H:i:s", time());
                   file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Changed User Password: $newPwdOne\n" , FILE_APPEND | LOCK_EX);
                 }
                 Header ("Location: $successUrl");
@@ -134,7 +134,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
       }
       else{
         //Failed to find username
-        $dtStamp = date("d/m/y : H:i:s", time());
+        $dtStamp = date("m/d/y: H:i:s", time());
         file_put_contents($logfile,"$dtStamp: Failed to find user\n" . "User: $uid\n", FILE_APPEND | LOCK_EX);
         Header ("Location: $failureUrl?failCode=4"); 
         die();
@@ -143,7 +143,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
     }
     else {
       //Failed to Bind with search DN login
-      $dtStamp = date("d/m/y : H:i:s", time());
+      $dtStamp = date("m/d/y: H:i:s", time());
       file_put_contents($logfile,"$dtStamp: Bind with search DN\n" . "BindDN: $binddn\nBindPwd: $bindpwd\n" .  "Error: " . ldap_error($ldap) . "\n", FILE_APPEND | LOCK_EX);
       Header ("Location: $failureUrl?failCode=3");
       die();
@@ -151,7 +151,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
   }
   else {
     //Failed to Connect to LDAP Server
-    $dtStamp = date("d/m/y : H:i:s", time());
+    $dtStamp = date("m/d/y: H:i:s", time());
     file_put_contents($logfile,"$dtStamp: Failed to Connect to LDAP Server\n" . "Server: $ldapHost\n" .  "Error: " . ldap_error($ldap) . "\n", FILE_APPEND | LOCK_EX);
     Header ("Location: $failureUrl?failCode=2");
     die();
@@ -159,7 +159,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
 }
 else {
   //Failed Password Validation
-  $dtStamp = date("d/m/y : H:i:s", time());
+  $dtStamp = date("m/d/y: H:i:s", time());
   file_put_contents($logfile,"$dtStamp: Failed Password Validation\n" . "Password: $newPwdOne  Password Validate: $newPwdTwo\n", FILE_APPEND | LOCK_EX);
   Header ("Location: $failureUrl?failCode=1");
   die();

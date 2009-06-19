@@ -1,0 +1,5 @@
+make a debug function for debug logging
+make a writelog function
+split up into functions
+put in class
+wrap the class for web request
