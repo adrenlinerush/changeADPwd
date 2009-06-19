@@ -1,0 +1,48 @@
+**************************************
+TITLE: changeADPwd
+WRITTEN BY: adrenlinerush
+LAST MOD: 6/19/09
+
+RELEASED UNDER GPL LICENSE 
+**************************************
+
+Description: php script that responds to standard http post to change password in active directory
+
+Files:
+  * changeADPwd.php - php that responds to posts you shouldn't have to change anything in here should just work
+      - Post requires that you post uid, curpwd, newpwdone, newpwdtwo
+      - Optional Post value are successurl, failurl to overide the defaults in the config
+      - On failue posts a failcode to failurl ie: redirects to http://failpage.php?failcode=1
+          1 - failed password validation
+          2 - failed initial connect to ldap server
+          3 - failed to bind with search dn
+          4 - failed to find user
+          5 - failed to get user cn
+          6 - failed to connect to ldap server second time
+          7 - failed to bind with user dn
+          8 - failed to change password
+  * changeADPwdConfig.php - settings for changeADPwd.php
+      - $ldapHost = ip or hostname of the ldap server 
+      - $oudc = the dn where the users reside  
+      - $searchdc = the root dn 
+      - $binddn = an unprivelaged user used to login and search for the dn of the username
+      - $bindpwd = the password for the $binddn user
+      - $logfile = where you want the logs to be written
+      - $debug = turn on debug loggin and display warnings on the web
+      - $defaultfailurl = redirects to this page if none is specified in the post on failure
+      - $defaultsuccessurl = redirects to this page if not is specifed in the post on success
+  * changeADPwdValidate.php - contains web validation of passwords change to suit your password rules default verifies the new and confirmation match
+  * fail.htm - just used for testing purposes
+  * success.htm - just used for testing purposes
+  * test.htm - an example form of how to post to changeADPwd.php with required values
+  * license - gpl license that this is released under
+    
+Installation:
+   * setup apache with php5 and a url access to the directory containing all these file
+   * change the changeADPwdConfig.php to suit your needs
+   * navigate to test.htm via web to verify and debug
+   * generate a post to suit your needs wheverever
+   * modify changeADPwdValidate.php to suit your needs
+   * have fun with it
+   * Active directory setup to handle ssl
+
