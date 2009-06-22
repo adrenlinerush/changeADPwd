@@ -1,8 +1,5 @@
 <?PHP
 
-if (!$debug) {
-  error_reporting(1);
-}
 
 $uid = $_GET['uid'];
 $curPwd = $_GET['curpwd'];
@@ -14,21 +11,25 @@ $failureUrl = $_GET['failurl'];
 include ("changeADPwdConfig.php"); 
 include ("changeADPwdValidate.php");
 
+if (!$debug) {
+  error_reporting(1);
+}
+
+require_once ("csLogging.class.php");
+
+$logwriter = new csLogging('changeADPwdConfig.php');
+
+
 if ($failureUrl == "") { $failureUrl = $defaultfailurl; }
 if ($successUrl == "") { $successUrl = $defaultsuccessurl; }
 
 if (validate_new_pwd($newPwdOne, $newPwdTwo)){
   // connect to LDAP server
-  if ($debug) {
-      $dtStamp = date("m/d/y : H:i:s", time());
-      file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Validated Password\n" , FILE_APPEND | LOCK_EX);
-  }
-  $ldap = ldap_connect("ldaps://$ldapHost",636) or $ldap = false;
+  $logwriter->debugwrite('Successfully Validated Password');
+  $ldap = ldap_connect("ldap://$ldapHost",636) or $ldap = false;
   if ($ldap) {
      //Connected successfully to ldap server
-      if ($debug) {
-        $dtStamp = date("m/d/y: H:i:s", time());
-        file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Connected to LDAP Server\n" , FILE_APPEND | LOCK_EX);
+     $logwriter->debugwrite('Successfully Connected to LDAP Server');
       }
     $res = ldap_bind($ldap,$binddn,$bindpwd) or $res = false;
     if ($res)
@@ -60,7 +61,7 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
             $dtStamp = date("m/d/y: H:i:s", time());
             file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Found User CN: $user_cn\n" , FILE_APPEND | LOCK_EX);
           }
-          $ldap = ldap_connect("ldaps://$ldapHost",636) or $ldap = false;
+          $ldap = ldap_connect("ldap://$ldapHost",636) or $ldap = false;
           if ($ldap) {
             if ($debug) {
               $dtStamp = date("m/d/y: H:i:s", time());
