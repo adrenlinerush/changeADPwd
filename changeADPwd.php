@@ -17,7 +17,7 @@ if (!$debug) {
 
 require_once ("csLogging.class.php");
 
-$logwriter = new csLogging('changeADPwdConfig.php');
+$logwriter = new csLogging($errorlogfile,$debuglogfile,$debug);
 
 
 if ($failureUrl == "") { $failureUrl = $defaultfailurl; }
@@ -26,70 +26,48 @@ if ($successUrl == "") { $successUrl = $defaultsuccessurl; }
 if (validate_new_pwd($newPwdOne, $newPwdTwo)){
   // connect to LDAP server
   $logwriter->debugwrite('Successfully Validated Password');
-  $ldap = ldap_connect("ldap://$ldapHost",636) or $ldap = false;
+  $ldap = ldap_connect("ldaps://$ldapHost:636") or $ldap = false;
   if ($ldap) {
      //Connected successfully to ldap server
-     $logwriter->debugwrite('Successfully Connected to LDAP Server');
-      }
+    $logwriter->debugwrite('Successfully Connected to LDAP Server');
     $res = ldap_bind($ldap,$binddn,$bindpwd) or $res = false;
     if ($res)
     {
       //Succcessfully bound with search DN login
-      if ($debug) {
-        $dtStamp = date("m/d/y: H:i:s", time());
-        file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Bound with Search DN: $binddn Passwd: $bindpwd\n" , FILE_APPEND | LOCK_EX);
-      }
-      if ($debug) {
-          $dtStamp = date("m/d/y: H:i:s", time());
-          file_put_contents($logfile,"DEBUG: $dtStamp: Searching for user: $uid\n" , FILE_APPEND | LOCK_EX);
-      }
+      $logwriter->debugwrite("Successfully Bound with Search DN: $binddn Passwd: $bindpwd");
+      
+      $logwriter->debugwrite("Searching for user: $uid");
+    
       $filter = "samaccountname=".$uid;
       $sr = ldap_search($ldap,$searchdc,$filter);
       if ($sr)
       {
         // Found username
-        if ($debug) {
-          $dtStamp = date("m/d/y: H:i:s", time());
-          file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Found User\n" , FILE_APPEND | LOCK_EX);
-        }
+        $logwriter->debugwrite("Successfully Found User");
+        
         $info = ldap_get_entries($ldap,$sr);
         if ($info["count"] > 0)
         {
           //Aquired user CN
           $user_cn = $info[0]["cn"][0];
-          if ($debug) {
-            $dtStamp = date("m/d/y: H:i:s", time());
-            file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Found User CN: $user_cn\n" , FILE_APPEND | LOCK_EX);
-          }
-          $ldap = ldap_connect("ldap://$ldapHost",636) or $ldap = false;
+          $logwriter->debugwrite("Successfully Found User CN: $user_cn");
+          
+          $ldap = ldap_connect("ldaps://$ldapHost",636) or $ldap = false;
           if ($ldap) {
-            if ($debug) {
-              $dtStamp = date("m/d/y: H:i:s", time());
-              file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Connected to LDAP Server Second Time\n" , FILE_APPEND | LOCK_EX);
-            }
+            $logwriter->debugwrite("Successfully Connected to LDAP Server Second Time");
+            
             $userdn = "cn=".$user_cn.", ".$oudc;
             //look up OU
-            if ($debug) {
-              $dtStamp = date("m/d/y: H:i:s", time());
-              file_put_contents($logfile,"DEBUG: $dtStamp: UserDN: $userdn\n" , FILE_APPEND | LOCK_EX);
-            }
+            $logwriter->debugwrite("UserDN: $userdn");
+            
             $res = @ldap_set_option($ldap , LDAP_OPT_PROTOCOL_VERSION, 3);
             $res = ldap_bind($ldap,$userdn,$curPwd);
             if ($res)
             {
-              if ($debug) {
-                $dtStamp = date("m/d/y: H:i:s", time());
-                file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Bound With User: $userdn Password: $curPwd\n" , FILE_APPEND | LOCK_EX);
-              }
-          
-              //$res = ldap_mod_replace ($ldap, $userdn, array('userpassword' => "{MD5}".base64_encode(pack("H*",md5($newPwdOne)))));
-    
+              $logwriter->debugwrite("Successfully Bound With User: $userdn Password: $curPwd");
+                
               $newpassword = "\"" . $newPwdOne. "\"";
-              /*$len = strlen($newpassword);
-              for ($i = 0; $i < $len; $i++) 
-              {
-                $newpass .= "{$newpassword{$i}}\000";
-              }*/
+            
               $newpass = mb_convert_encoding($newpassword, "UTF-16LE"); 
               $entry["unicodePwd"] = $newpass;
             
@@ -97,16 +75,14 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
               
               if ($res) {
                 //Successfully Changed user Password
-                if ($debug) {
-                  $dtStamp = date("m/d/y: H:i:s", time());
-                  file_put_contents($logfile,"DEBUG: $dtStamp: Successfully Changed User Password: $newPwdOne\n" , FILE_APPEND | LOCK_EX);
-                }
+                $logwriter->debugwrite("Successfully Changed User Password: $newPwdOne");
+                
                 Header ("Location: $successUrl");
                 die();
               } 
               else {
-                //Failed to change user Password
-                file_put_contents($logfile,"$dtStamp: Failed to Change Password: $newPwdOne Unicode: $newpass LDAP Error:" . ldap_error($ldap) . "\n" , FILE_APPEND | LOCK_EX);
+                //Failed to change user Password  
+                 $logwriter->writelog("Failed to Change Password: $newPwdOne Unicode: $newpass LDAP Error:" . ldap_error($ldap));
                 Header ("Location: $failureUrl?failCode=8");
                 die();
               }
@@ -114,29 +90,28 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
             }
             else {
               //Failed to bind with user's credentials
-              file_put_contents($logfile,"$dtStamp: Failed to Bind with search DN\n" . "BindDN: $userdn\nBindPwd: $curPwd\n" .  "Error: " . ldap_error($ldap) . "\n", FILE_APPEND | LOCK_EX);
+              $logwriter->writelog("Failed to Bind with search DN\n" . "BindDN: $userdn\nBindPwd: $curPwd\n" .  "Error: " . ldap_error($ldap));
               Header ("Location: $failureUrl?failCode=7");
               die();
             }
           }
           else {
-            //Falied to connect second time    
-            file_put_contents($logfile,"$dtStamp: Failed to connect second time\n" . "Server: $ldapHost\n" .  "Error: " . ldap_error($ldap) . "\n", FILE_APPEND | LOCK_EX);
+            //Falied to connect second time   
+          $logwriter->writelog("Failed to connect second time\n" . "Server: $ldapHost\n" .  "Error: " . ldap_error($ldap));
             Header ("Location: $failureUrl?failCode=6");
             die();
           }
         }
         else{
           //Failed to aquire user CN
-          file_put_contents($logfile,"$dtStamp: Failed to get User CN\n" . "User: $uid\n", FILE_APPEND | LOCK_EX);
+          $logwriter->writelog("Failed to get User CN\n" . "User: $uid");
           Header ("Location: $failureUrl?failCode=5"); 
           die();
         }      
       }
       else{
         //Failed to find username
-        $dtStamp = date("m/d/y: H:i:s", time());
-        file_put_contents($logfile,"$dtStamp: Failed to find user\n" . "User: $uid\n", FILE_APPEND | LOCK_EX);
+        $logwriter->writelog("Failed to find user\n" . "User: $uid");
         Header ("Location: $failureUrl?failCode=4"); 
         die();
       }
@@ -144,24 +119,21 @@ if (validate_new_pwd($newPwdOne, $newPwdTwo)){
     }
     else {
       //Failed to Bind with search DN login
-      $dtStamp = date("m/d/y: H:i:s", time());
-      file_put_contents($logfile,"$dtStamp: Bind with search DN\n" . "BindDN: $binddn\nBindPwd: $bindpwd\n" .  "Error: " . ldap_error($ldap) . "\n", FILE_APPEND | LOCK_EX);
+      $logwriter->writelog("Bind with search DN\n" . "BindDN: $binddn\nBindPwd: $bindpwd\n" .  "Error: " . ldap_error($ldap));
       Header ("Location: $failureUrl?failCode=3");
       die();
     }
   }
   else {
     //Failed to Connect to LDAP Server
-    $dtStamp = date("m/d/y: H:i:s", time());
-    file_put_contents($logfile,"$dtStamp: Failed to Connect to LDAP Server\n" . "Server: $ldapHost\n" .  "Error: " . ldap_error($ldap) . "\n", FILE_APPEND | LOCK_EX);
+    $logwriter->writelog("Failed to Connect to LDAP Server\n" . "Server: $ldapHost\n" .  "Error: " . ldap_error($ldap));
     Header ("Location: $failureUrl?failCode=2");
     die();
   }
 }
 else {
   //Failed Password Validation
-  $dtStamp = date("m/d/y: H:i:s", time());
-  file_put_contents($logfile,"$dtStamp: Failed Password Validation\n" . "Password: $newPwdOne  Password Validate: $newPwdTwo\n", FILE_APPEND | LOCK_EX);
+  $logwriter->writelog("Failed Password Validation\n" . "Password: $newPwdOne  Password Validate: $newPwdTwo");
   Header ("Location: $failureUrl?failCode=1");
   die();
 }

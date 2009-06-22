@@ -7,6 +7,7 @@ $binddn = "cn=Test T. Test, ".$oudc;
 $bindpwd = "testpass";
 $logfile = "changeADPwd.log";
 $errorlogfile = "changeADPwd.log";
+$debuglogfile = "changeADPwd.log";
 $debug = true;
 $defaultfailurl = "fail.htm";
 $defaultsuccessurl = "success.htm";
