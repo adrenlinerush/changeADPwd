@@ -6,6 +6,7 @@ class csChangeADPasswd {
   private $strHost;
   private $strSearchDC;
   private $objSearchBind;
+  private $strOUDC;
 
   function __construct($failureUrl, $successUrl) {
     include_once ("changeADPwdConfig.php"); 
@@ -25,6 +26,7 @@ class csChangeADPasswd {
   
     $this->strHost = $ldapHost;
     $this->strSearchDC = $searchdc;
+    $this->strOUDC = $oudc
 
     $this->objSearchBind = $this->bindLDAP($binddn,$bindpwd, true);
   }
@@ -32,7 +34,8 @@ class csChangeADPasswd {
   public function changePWD($strUID, $strOldPwd, $strNewPwdOne, $strNewPwdTwo) {
     include_once ("changeADPwdValidate.php");
     if (validate_new_pwd($strNewPwdOne, $strNewPwdTwo)){
-      $strUserDN = $this->getDN($strUID);
+      $strUser = $this->getDN($strUID);
+      $strUserDN = "cn=".$strUser.", ". $this->strOUDC;
       $objUserBind = $this->bindLDAP($strUserDN, $strOldPwd, false);
       $this->changeADPWD($objUserBind, $strUserDN, $strNewPwdOne);
     }
@@ -109,7 +112,7 @@ class csChangeADPasswd {
     } 
     else {
       //Failed to change user Password  
-      $this->failure(8, array($strNewPwd,$newpass,ldap_error($ldap)));
+      $this->failure(8, array($strNewPwd,$newpass,ldap_error($objLdapBinding)));
     }
   }
 
