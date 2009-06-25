@@ -4,11 +4,10 @@ class csChangeADPasswd {
   private $strFailURL;
   private $strSuccessURL;
   private $strHost;
-  private $strOUDC;
   private $strSearchDC;
   private $objSearchBind;
 
-  function __construct() {
+  function __construct($failureUrl, $successUrl) {
     include_once ("changeADPwdConfig.php"); 
 
     if (!$debug) {
@@ -25,7 +24,6 @@ class csChangeADPasswd {
     $this->strSuccessURL = $successUrl;
   
     $this->strHost = $ldapHost;
-    $this->strOUDC = $oudc;
     $this->strSearchDC = $searchdc;
 
     $this->objSearchBind = $this->bindLDAP($binddn,$bindpwd, true);
