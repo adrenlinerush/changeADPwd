@@ -153,7 +153,7 @@ class csChangeADPasswd {
     die();
   }
 }
-?>
+
 
 
 
