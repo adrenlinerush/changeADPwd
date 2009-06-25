@@ -26,7 +26,7 @@ class csChangeADPasswd {
   
     $this->strHost = $ldapHost;
     $this->strSearchDC = $searchdc;
-    $this->strOUDC = $oudc
+    $this->strOUDC = $oudc;
 
     $this->objSearchBind = $this->bindLDAP($binddn,$bindpwd, true);
   }
