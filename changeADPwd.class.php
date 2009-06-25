@@ -143,13 +143,13 @@ class csChangeADPasswd {
         $this->logwriter->writelog("Failed to Change Password: $aryLogParams[0] Unicode: $aryLogParams[1] LDAP Error:" . $aryLogParams[2]);
         break;    
     }
-    Header ("Location: $this->strFailURL?failCode=$iFailCode");
+    Header ("Location: " . $this->strFailURL . "?failCode=$iFailCode");
     die();
   }
 
   private function success($strNewPwd) {
     $this->logwriter->debugwrite("Successfully Changed User Password: $strNewPwd");             
-    Header ("Location: $this->strSuccessURL");
+    Header ("Location: " . $this->strSuccessURL);
     die();
   }
 }
