@@ -1,12 +1,21 @@
 **************************************
 TITLE: changeADPwd
 WRITTEN BY: adrenlinerush
-LAST MOD: 6/19/09
+LAST MOD: 6/25/09
 
 RELEASED UNDER GPL LICENSE 
 **************************************
 
 Description: php script that responds to standard http post to change password in active directory
+
+Changes 6/25/09
+
+changeADPwd.php should no longer be used... 
+changeADPwd.class.php is cleaned up to have functions and a class
+changeADPwd.wrap.php wraps the class and shoudl be accessed the same way as chanageADPwd.php all 
+
+treat all other files the same way
+
 
 Files:
   * changeADPwd.php - php that responds to posts you shouldn't have to change anything in here should just work
