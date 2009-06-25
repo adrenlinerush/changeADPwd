@@ -57,10 +57,10 @@ class csChangeADPasswd {
       }
       else {
         if ($bSearch) {
-          $this->failure(3, array($strDN, $strnPWD, ldap_error($ldap)));
+          $this->failure(3, array($strDN, $strPWD, ldap_error($ldap)));
         }
         else {
-          $this->failure(7, array($strDN, $strnPWD, ldap_error($ldap)));
+          $this->failure(7, array($strDN, $strPWD, ldap_error($ldap)));
         }
       }
     }

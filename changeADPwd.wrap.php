@@ -11,6 +11,6 @@ $failureUrl = $_GET['failurl'];
 include_once ("changeADPwd.class.php");
 
 $objChangePasswd = new csChangeADPasswd($failureUrl,$successUrl);
-$objChangePasswd->changePWD($uid,$curPwd,$newPwdOne,$newPwdTwo);
+$null = $objChangePasswd->changePWD($uid,$curPwd,$newPwdOne,$newPwdTwo);
 
 ?>
