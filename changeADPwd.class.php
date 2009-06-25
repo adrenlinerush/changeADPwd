@@ -109,7 +109,7 @@ class csChangeADPasswd {
     } 
     else {
       //Failed to change user Password  
-      $this->failure(8, array($strNewPwd,$newpass,ldap_error($ldap));
+      $this->failure(8, array($strNewPwd,$newpass,ldap_error($ldap)));
     }
   }
 
