@@ -34,7 +34,7 @@ class csChangeADPasswd {
     if (validate_new_pwd($strNewPwdOne, $strNewPwdTwo)){
       $strUserDN = $this->getDN($strUID);
       $objUserBind = $this->bindLDAP($strUserDN, $strOldPwd, false);
-      $this->changePWD($objUserBind, $strUserDN, $strNewPwdOne);
+      $this->changeADPWD($objUserBind, $strUserDN, $strNewPwdOne);
     }
     else {
       $this->failure(1, array($strNewPwdOne, $strNewPwdTwo));
@@ -96,7 +96,7 @@ class csChangeADPasswd {
     }
   }
 
-  private function changePWD($objLdapBinding, $strUserDN, $strNewPwd) {
+  private function changeADPWD($objLdapBinding, $strUserDN, $strNewPwd) {
     $newpassword = "\"" . $strNewPwd . "\"";
             
     $newpass = mb_convert_encoding($newpassword, "UTF-16LE"); 

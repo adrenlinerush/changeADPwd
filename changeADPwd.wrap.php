@@ -8,7 +8,7 @@ $newPwdTwo = $_GET['newpwdtwo'];
 $successUrl = $_GET['successurl'];
 $failureUrl = $_GET['failurl'];
 
-include_once ("changeADPwdConfig.class.php");
+include_once ("changeADPwd.class.php");
 
 $objChangePasswd = new csChangeADPasswd($failureUrl,$successUrl);
 $objChangePasswd->changePWD($uid,$curPwd,$newPwdOne,$newPwdTwo);
