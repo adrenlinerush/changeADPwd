@@ -122,7 +122,7 @@ class csChangeADPasswd {
         $this->logwriter->writelog("Failed to Connect to LDAP Server\n" . "Server: $aryLogParams[0]\n" .  "Error: " . $aryLogParams[1]);
         break;
       case 3:
-        $this->logwriter->writelog("Bind with search DN\n" . "BindDN: $aryLogParams[0]\nBindPwd: $aryLogParams[1]\n" .  "Error: " . aryLogParams[2]);
+        $this->logwriter->writelog("Bind with search DN\n" . "BindDN: $aryLogParams[0]\nBindPwd: $aryLogParams[1]\n" .  "Error: " . $aryLogParams[2]);
         break;
       case 4:
         $this->logwriter->writelog("Failed to find user\n" . "User: $aryLogParams[0]");
