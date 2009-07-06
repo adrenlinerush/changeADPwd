@@ -20,7 +20,7 @@ class csChangeADPasswd {
     $this->logwriter = new csLogging($errorlogfile,$debuglogfile,$debug);
 
     if ($failureUrl == "") { $failureUrl = $defaultfailurl; }
-    $this->strFailURL = $failureURL;
+    $this->strFailURL = $failureUrl;
     if ($successUrl == "") { $successUrl = $defaultsuccessurl; }
     $this->strSuccessURL = $successUrl;
   
